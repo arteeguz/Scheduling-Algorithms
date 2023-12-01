@@ -55,7 +55,7 @@ public:
     }
 
     void setBurstTime(int burstTime) {
-        this->burstTime = burstTime; 
+        this->burstTime = burstTime;
     }
 
     int getRemainingBurstTime() {

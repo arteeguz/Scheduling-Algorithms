@@ -37,6 +37,7 @@ int main() {
     for (int i = 0; i < numJobs; i++) {
         file >> processId >> arrivalTime >> burstTime;
         processArray[i] = Process(processId, arrivalTime, burstTime);
+        processArray[i].setRemainingBurstTime(burstTime);
     }
     
     file.close();
