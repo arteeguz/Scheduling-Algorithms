@@ -54,7 +54,7 @@ int roundRobin(Process processArray[], int numJobs, int quantum) {
             int idx = processQueue.front();
             processQueue.pop();
 
-            int timeSlice = min(quantum , processArray[idx].getBurstTime());
+            int timeSlice = min(quantum , processArray[idx].getRemainingBurstTime());
 
             if (processArray[idx].getStartTime() == 0) {
                 processArray[idx].setWaitingTime(currentTime - processArray[idx].getArrivalTime());
@@ -62,9 +62,9 @@ int roundRobin(Process processArray[], int numJobs, int quantum) {
             }
 
             currentTime += timeSlice;
-            processArray[idx].setBurstTime(processArray[idx].getBurstTime() - timeSlice);
+            processArray[idx].setRemainingBurstTime(processArray[idx].getRemainingBurstTime() - timeSlice);
 
-            if (processArray[idx].getBurstTime() == 0) {
+            if (processArray[idx].getRemainingBurstTime() == 0) {
                 processArray[idx].setFinishTime(currentTime);
                 processArray[idx].setTurnAroundTime(currentTime - processArray[idx].getArrivalTime());
                 exeOrder.push_back(processArray[idx].getProcessId());

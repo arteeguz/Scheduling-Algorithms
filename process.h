@@ -55,7 +55,15 @@ public:
     }
 
     void setBurstTime(int burstTime) {
-        this->burstTime = burstTime;
+        this->burstTime = burstTime; 
+    }
+
+    int getRemainingBurstTime() {
+        return remainingBurstTime;
+    }
+
+    void setRemainingBurstTime(int remaining) {
+        remainingBurstTime = remaining;
     }
     
     int getArrivalTime() {
@@ -79,7 +87,8 @@ private:
     int turnAroundTime; //Total time process spent in the system
     int arrivalTime; //Time the process enters the system
     int finishTime; //Time the process finishes executing
-    int burstTime; //Time required to execute
+    int burstTime; //Time required to execute ----
+    int remainingBurstTime = burstTime; //Don't change burstTime once its set, we need to reuse it for RR func
     int startTime; //Time the process beigns executing
     int waitingTime; //Time the process spent before beginning its execution
 };
