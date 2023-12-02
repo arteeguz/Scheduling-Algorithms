@@ -37,6 +37,7 @@ int main() {
     for (int i = 0; i < numJobs; i++) {
         file >> processId >> arrivalTime >> burstTime;
         processArray[i] = Process(processId, arrivalTime, burstTime);
+        processArray[i].setRemainingBurstTime(burstTime);
     }
     
     file.close();
@@ -93,11 +94,16 @@ void outputData(Process processArray[], int numJobs, int totalSwitchTime){
     cout << "Average TAT: " << avgTAT << " time units" << endl;
     cout << "Average Waiting Time: " << avgWaitingTime << " time units" << endl;
     cout << "CPU Efficiency: " << fixed << setprecision(1) << efficiency << "%" << endl << endl;
-    
+    cout << "Process\t\tService Time\t\tTurn Around Time" << endl;    
     for(int i = 0; i < numJobs; i++){
-        cout << "Process " << processArray[i].getProcessId() << ": " << endl;
-        cout << "Service time = " << processArray[i].getBurstTime() << endl;
-        cout << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
+
+        cout << "P-" << processArray[i].getProcessId() << "\t\t" 
+             << processArray[i].getBurstTime() << "\t\t\t" 
+             << processArray[i].getTurnAroundTime() << endl; 
+
+        //cout << "Process " << processArray[i].getProcessId() << ": " << endl;
+        //cout << "Service time = " << processArray[i].getBurstTime() << endl;
+        //cout << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
     }
     
     cout << endl;
