@@ -6,12 +6,11 @@
 
 using namespace std;
 
-const int MAX_JOBS = 100;
 const int SWITCH_TIME = 2;
 
 int firstComeFirstServe(Process processArray[], int numJobs) {
     int currentTime = 0;
-    int totalSwitchTime = 0;
+    int totalSwitch = 0;
 
     for (int i = 0; i < numJobs; i++) {
         if (currentTime < processArray[i].getArrivalTime()) {
@@ -19,7 +18,7 @@ int firstComeFirstServe(Process processArray[], int numJobs) {
         }
         if (i > 0) {
             currentTime += SWITCH_TIME;
-            totalSwitchTime += SWITCH_TIME;
+            totalSwitch += SWITCH_TIME;
         }
         processArray[i].setWaitingTime(currentTime - processArray[i].getArrivalTime());
         processArray[i].setStartTime(currentTime);
@@ -27,7 +26,8 @@ int firstComeFirstServe(Process processArray[], int numJobs) {
         processArray[i].setFinishTime(currentTime);
         processArray[i].setTurnAroundTime(currentTime - processArray[i].getArrivalTime());
     }
-    return totalSwitchTime;
+    processArray[numJobs - 1].setTotalSwitchTime(totalSwitch);
+    return currentTime;
 }
 
 //fix algorithm
@@ -36,14 +36,14 @@ int roundRobin(Process processArray[], int numJobs, int quantum) {
     vector<int> exeOrder;
     vector<bool> addedToQueue(numJobs, false);
     int currentTime = 0;
-    int totalSwitchTime = 0;
+    int totalSwitch = 0;
     
     for(int i = 0; i < numJobs; i++){
         processArray[i].setStartTime(0);
     }
 
     while (exeOrder.size() < numJobs) {
-        for (int i = 0; i < numJobs; ++i) {
+        for (int i = 0; i < numJobs; i++) {
             if (processArray[i].getArrivalTime() <= currentTime && !addedToQueue[i]) {
                 processQueue.push(i);
                 addedToQueue[i] = true;
@@ -59,10 +59,14 @@ int roundRobin(Process processArray[], int numJobs, int quantum) {
             if (processArray[idx].getStartTime() == 0) {
                 processArray[idx].setWaitingTime(currentTime - processArray[idx].getArrivalTime());
                 processArray[idx].setStartTime(currentTime);
+                currentTime += SWITCH_TIME;
+                totalSwitch += SWITCH_TIME;
             }
 
             currentTime += timeSlice;
             processArray[idx].setRemainingBurstTime(processArray[idx].getRemainingBurstTime() - timeSlice);
+            currentTime += SWITCH_TIME;
+            totalSwitch += SWITCH_TIME;
 
             if (processArray[idx].getRemainingBurstTime() == 0) {
                 processArray[idx].setFinishTime(currentTime);
@@ -81,5 +85,7 @@ int roundRobin(Process processArray[], int numJobs, int quantum) {
             currentTime = nextArrivalTime;
         }
     }
-    return totalSwitchTime;
+    
+    processArray[numJobs - 1].setTotalSwitchTime(totalSwitch);
+    return currentTime;
 }
