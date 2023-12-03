@@ -16,8 +16,8 @@
 using namespace std;
 
 //func prototype
-void outputData(Process processArray[], int numJobs, int totalSwitchTime);
-void switchAlgorithm(int num, Process processArray[], int numJobs, int quantum);
+void outputData(Process processArray[], int numJobs, int endTime, ofstream &outFile, const string &algorithmName);
+void switchAlgorithm(int num, Process processArray[], int numJobs, int quantum, ofstream &outFile);
 
 const int MAX_JOBS = 100;
 
@@ -26,50 +26,61 @@ int main() {
     const int QUANTUM = 50;
     Process processArray[MAX_JOBS];
     int processId, arrivalTime, burstTime, numJobs;
-    
-    ifstream file("SchedulingAlgorithmsInput.txt");
+
+    ifstream file("./Data/SchedulingAlgorithmsInput.txt");
     if (!file.is_open()) {
         cout << "Error opening file" << endl;
         return -1;
     }
-    
+
     file >> numJobs;
     for (int i = 0; i < numJobs; i++) {
         file >> processId >> arrivalTime >> burstTime;
         processArray[i] = Process(processId, arrivalTime, burstTime);
     }
-    
+
     file.close();
-    
-    for(int i = 0; i < NUM_ALGORITHMS; i++){
-        switchAlgorithm(i, processArray, numJobs, QUANTUM);
+
+    ofstream outFile("./Data/output.txt");
+    if (!outFile.is_open()) {
+        cout << "Error opening output file" << endl;
+        return -1;
     }
-    
+
+    for (int i = 0; i < NUM_ALGORITHMS; i++) {
+        switchAlgorithm(i, processArray, numJobs, QUANTUM, outFile);
+    }
+
+    outFile.close();
     return 0;
 }
 
-void switchAlgorithm(int num, Process processArray[], int numJobs, int quantum) {
+
+void switchAlgorithm(int num, Process processArray[], int numJobs, int quantum, ofstream &outFile) {
     int endTime;
-    
+    string algorithmName;
+
     switch (num) {
         case 0:
-            cout << "First Come First Serve (non-preemptive):" << endl << endl;
+            algorithmName = "First Come First Serve (non-preemptive)";
+            cout << algorithmName << ":" << endl << endl;
             endTime = firstComeFirstServe(processArray, numJobs);
             break;
-            
+
         case 1:
-            cout << "Round Robin (preemptive): " << endl << endl;
+            algorithmName = "Round Robin (preemptive)";
+            cout << algorithmName << ":" << endl << endl;
             endTime = roundRobin(processArray, numJobs, quantum);
             break;
-            
+
         default:
             return;
     }
-    outputData(processArray, numJobs, endTime);
+    outputData(processArray, numJobs, endTime, outFile, algorithmName);
 }
 
-void outputData(Process processArray[], int numJobs, int endTime){
-    
+
+void outputData(Process processArray[], int numJobs, int endTime, ofstream &outFile, const string &algorithmName) {
     double efficiency = 0.0;
     int avgTAT = 0;
     int avgWaitingTime = 0;
@@ -78,32 +89,39 @@ void outputData(Process processArray[], int numJobs, int endTime){
     int totalTime = 0;
     int totalBurstTime = 0;
 
-    for(int i = 0; i < numJobs; i++){
+    for (int i = 0; i < numJobs; i++) {
         totalTAT += processArray[i].getTurnAroundTime();
         totalWaitingTime += processArray[i].getWaitingTime();
         totalBurstTime += processArray[i].getBurstTime();
     }
-    
+
     efficiency = ((double)totalBurstTime / (totalBurstTime + processArray[numJobs - 1].getTotalSwitchTime())) * 100;
     totalTime = endTime - processArray[0].getStartTime();
     avgTAT = totalTAT / numJobs;
-    avgWaitingTime = totalWaitingTime / numJobs; //not correct yet for roundrobin
-    
+    avgWaitingTime = totalWaitingTime / numJobs;
+
+    cout << "Algorithm: " << algorithmName << endl;
     cout << "Total Time: " << totalTime << " time units" << endl;
     cout << "Average TAT: " << avgTAT << " time units" << endl;
     cout << "Average Waiting Time: " << avgWaitingTime << " time units" << endl;
     cout << "CPU Efficiency: " << fixed << setprecision(1) << efficiency << "%" << endl << endl;
-    cout << left << setw(15) << "Process" << setw(20) << "Service Time" << setw(20) << "Turn Around Time" << endl;
 
-    for(int i = 0; i < numJobs; i++){
+    outFile << "Algorithm: " << algorithmName << endl;
+    outFile << "Total Time: " << totalTime << " time units" << endl;
+    outFile << "Average TAT: " << avgTAT << " time units" << endl;
+    outFile << "Average Waiting Time: " << avgWaitingTime << " time units" << endl;
+    outFile << "CPU Efficiency: " << fixed << setprecision(1) << efficiency << "%" << endl << endl;
+
+    for (int i = 0; i < numJobs; i++) {
         cout << left << setw(15) << ("P" + to_string(processArray[i].getProcessId()))
              << setw(20) << processArray[i].getBurstTime()
              << setw(20) << processArray[i].getTurnAroundTime() << endl;
-        
-//        cout << "Process " << processArray[i].getProcessId() << ": " << endl;
-//        cout << "Service time = " << processArray[i].getBurstTime() << endl;
-//        cout << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
+
+        // outFile << "Process " << processArray[i].getProcessId() << ": " << endl;
+        // outFile << "Service time = " << processArray[i].getBurstTime() << endl;
+        // outFile << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
     }
 
     cout << endl;
+    outFile << endl;
 }

@@ -1,0 +1,3 @@
+Algorithm,Total Time,Average TAT,Average Waiting Time,CPU Efficiency
+First Come First Serve (non-preemptive),2419,1226,1180,95.9
+Round Robin (preemptive),2488,1372,952,90.6

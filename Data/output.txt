@@ -1,0 +1,14 @@
+Algorithm: First Come First Serve (non-preemptive)
+Total Time: 2419 time units
+Average TAT: 1226 time units
+Average Waiting Time: 1180 time units
+CPU Efficiency: 95.9%
+
+
+Algorithm: Round Robin (preemptive)
+Total Time: 2488 time units
+Average TAT: 1372 time units
+Average Waiting Time: 952 time units
+CPU Efficiency: 90.6%
+
+
