@@ -3,9 +3,9 @@
 //  CSC-332-Scheduling
 //
 
-//make sure all the stats are calculated
-//fix the round robin algorithm
+//rewrite the round robin algorithm
 //make sure the ready queue is implemented in all algorithms
+//ask professor about ready queue and output format
 
 #include <iostream>
 #include <iomanip>
@@ -37,7 +37,6 @@ int main() {
     for (int i = 0; i < numJobs; i++) {
         file >> processId >> arrivalTime >> burstTime;
         processArray[i] = Process(processId, arrivalTime, burstTime);
-        processArray[i].setRemainingBurstTime(burstTime);
     }
     
     file.close();
@@ -50,26 +49,26 @@ int main() {
 }
 
 void switchAlgorithm(int num, Process processArray[], int numJobs, int quantum) {
-    int totalSwitchTime;
+    int endTime;
     
     switch (num) {
         case 0:
             cout << "First Come First Serve (non-preemptive):" << endl << endl;
-            totalSwitchTime = firstComeFirstServe(processArray, numJobs);
+            endTime = firstComeFirstServe(processArray, numJobs);
             break;
             
         case 1:
             cout << "Round Robin (preemptive): " << endl << endl;
-            totalSwitchTime = roundRobin(processArray, numJobs, quantum);
+            endTime = roundRobin(processArray, numJobs, quantum);
             break;
             
         default:
             return;
     }
-    outputData(processArray, numJobs, totalSwitchTime);
+    outputData(processArray, numJobs, endTime);
 }
 
-void outputData(Process processArray[], int numJobs, int totalSwitchTime){
+void outputData(Process processArray[], int numJobs, int endTime){
     
     double efficiency = 0.0;
     int avgTAT = 0;
@@ -85,8 +84,8 @@ void outputData(Process processArray[], int numJobs, int totalSwitchTime){
         totalBurstTime += processArray[i].getBurstTime();
     }
     
-    efficiency = ((double)totalBurstTime / (totalBurstTime + totalSwitchTime)) * 100;
-    totalTime = processArray[numJobs - 1].getFinishTime() - processArray[0].getStartTime();
+    efficiency = ((double)totalBurstTime / (totalBurstTime + processArray[numJobs - 1].getTotalSwitchTime())) * 100;
+    totalTime = endTime - processArray[0].getStartTime();
     avgTAT = totalTAT / numJobs;
     avgWaitingTime = totalWaitingTime / numJobs; //not correct yet for roundrobin
     
@@ -94,17 +93,17 @@ void outputData(Process processArray[], int numJobs, int totalSwitchTime){
     cout << "Average TAT: " << avgTAT << " time units" << endl;
     cout << "Average Waiting Time: " << avgWaitingTime << " time units" << endl;
     cout << "CPU Efficiency: " << fixed << setprecision(1) << efficiency << "%" << endl << endl;
-    cout << "Process\t\tService Time\t\tTurn Around Time" << endl;    
+    cout << left << setw(15) << "Process" << setw(20) << "Service Time" << setw(20) << "Turn Around Time" << endl;
+
     for(int i = 0; i < numJobs; i++){
-
-        cout << "P-" << processArray[i].getProcessId() << "\t\t" 
-             << processArray[i].getBurstTime() << "\t\t\t" 
-             << processArray[i].getTurnAroundTime() << endl; 
-
-        //cout << "Process " << processArray[i].getProcessId() << ": " << endl;
-        //cout << "Service time = " << processArray[i].getBurstTime() << endl;
-        //cout << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
+        cout << left << setw(15) << ("P" + to_string(processArray[i].getProcessId()))
+             << setw(20) << processArray[i].getBurstTime()
+             << setw(20) << processArray[i].getTurnAroundTime() << endl;
+        
+//        cout << "Process " << processArray[i].getProcessId() << ": " << endl;
+//        cout << "Service time = " << processArray[i].getBurstTime() << endl;
+//        cout << "Turn Around Time = " << processArray[i].getTurnAroundTime() << endl << endl;
     }
-    
+
     cout << endl;
 }
